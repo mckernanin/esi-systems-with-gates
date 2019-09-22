@@ -97,10 +97,22 @@ async function getSystemsWithConnections(regionId) {
 }
 
 const requestHandler = (req, res) => {
-  console.log(req.query);
-  getSystemsWithConnections(req.query.region).then(data => {
-    res.json(data);
-  });
+  if (!req.query.region) {
+    return res.status(400).json({
+      message:
+        "Missing parameters, make sure to pass a region ID in a query string like ?region=12345"
+    });
+  }
+  getSystemsWithConnections(req.query.region)
+    .then(data => {
+      return res.json(data);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).send({
+        message: "An error has occured."
+      });
+    });
 };
 
 module.exports = requestHandler;
